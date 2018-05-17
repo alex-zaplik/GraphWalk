@@ -125,7 +125,7 @@ void weighted_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point
 
 void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point start_time)
 {
-	std::vector<bool> visited(max_vec + 1, false);
+	std::vector<unsigned int> visited(max_vec + 1, false);
 
 	unsigned int visit_count = 0;
 	unsigned long long step_count = 0;
@@ -136,7 +136,7 @@ void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point st
 
 	while (visit_count < max_vec)
 	{
-		if (visited[curr] == false)
+		if (visited[curr] == 0)
 		{
 			visit_count++;
 		}
@@ -144,10 +144,13 @@ void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point st
 		std::cerr << curr;
 
 		total_weight += next_weight;
-		visited[curr] = true;
+		visited[curr]++;
 		step_count++;
 
 		// TODO:
+		next = std::min_element(adj[curr].begin(), adj[curr].end(), [=](Pair a, Pair b) { return visited[a.first] < visited[b.first]; }) - adj[curr].begin();
+		
+		/*
 		next = 0;
 		while (next < adj[curr].size() && visited[adj[curr][next].first])
 		{
@@ -158,6 +161,7 @@ void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point st
 		{
 			break;
 		}
+		*/
 
 		next_weight = adj[curr][next].second;
 		curr = adj[curr][next].first;
