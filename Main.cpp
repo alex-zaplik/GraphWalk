@@ -11,6 +11,9 @@
 #include "Prim.h"
 #include "Kruskal.h"
 
+#define VISITED 1
+#define IGNORED 2
+
 typedef std::chrono::system_clock::time_point time_point;
 typedef std::pair<unsigned int, double> Pair;
 typedef std::vector<std::vector<Pair>> Adj;
@@ -125,7 +128,7 @@ void weighted_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point
 
 void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point start_time)
 {
-	std::vector<unsigned int> visited(max_vec + 1, false);
+	std::vector<int> visited(max_vec + 1, false);
 
 	unsigned int visit_count = 0;
 	unsigned long long step_count = 0;
@@ -144,24 +147,14 @@ void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point st
 		std::cerr << curr;
 
 		total_weight += next_weight;
-		visited[curr]++;
+		visited[curr] = std::max(visited[curr], VISITED);
 		step_count++;
 
-		// TODO:
 		next = std::min_element(adj[curr].begin(), adj[curr].end(), [=](Pair a, Pair b) { return visited[a.first] < visited[b.first]; }) - adj[curr].begin();
-		
-		/*
-		next = 0;
-		while (next < adj[curr].size() && visited[adj[curr][next].first])
+		if (visited[adj[curr][next].first] > 0)
 		{
-			next++;
+			visited[curr] = IGNORED;
 		}
-
-		if (next >= adj[curr].size())
-		{
-			break;
-		}
-		*/
 
 		next_weight = adj[curr][next].second;
 		curr = adj[curr][next].first;
