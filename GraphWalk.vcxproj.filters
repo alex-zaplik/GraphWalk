@@ -41,4 +41,18 @@
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="5.in">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="50.in">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="5000.in">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="500.in">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

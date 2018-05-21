@@ -12,20 +12,18 @@ namespace Prim
 		weight = 0;
 
 		PriorityQueue pq;
+		std::vector<std::pair<std::shared_ptr<Element>, bool>> elems(max_vec + 1);
 		for (unsigned int i = 2; i <= max_vec; i++)
 		{
-			pq.insert(i, 0, std::numeric_limits<unsigned int>::max());
+			elems[i] = { pq.insert(i, 0, std::numeric_limits<unsigned int>::max()), true };
 		}
-		pq.insert(1, 0, 0);
+		elems[1] = { pq.insert(1, 0, 0), true };
 
-		std::vector<std::list<std::pair<std::shared_ptr<Element>, double>>> adj(max_vec + 1);
+		std::vector<std::vector<double>> matrix(max_vec + 1, std::vector<double>(max_vec + 1, -1));
 		for (unsigned int i = 0; i < edges.size(); i++)
 		{
-			unsigned int j;
-			pq.in_queue(edges[i].out, j);
-			adj[edges[i].in].push_back(std::pair<std::shared_ptr<Element>, double>(pq.at(j), edges[i].w));
-			pq.in_queue(edges[i].in, j);
-			adj[edges[i].out].push_back(std::pair<std::shared_ptr<Element>, double>(pq.at(j), edges[i].w));
+			matrix[edges[i].in][edges[i].out] = edges[i].w;
+			matrix[edges[i].out][edges[i].in] = edges[i].w;
 		}
 
 		while (!pq.empty())
@@ -34,19 +32,26 @@ namespace Prim
 			unsigned int parent = pq.at(0)->parent;
 			unsigned int u = pq.pop();
 
+			elems[u].second = false;
+
 			if (parent > 0)
 			{
 				weight += w;
 				A.push_back(Edge(u, parent, w));
 			}
 
-			for (auto v : adj[u])
+			for (unsigned int j = 1; j <= max_vec; j++)
 			{
-				unsigned int i;
-				if (pq.in_queue(v.first->val, i) && v.second < v.first->p)
+				if (j == u)
+				{
+					continue;
+				}
+
+				auto v = elems[j];
+				if (v.second && matrix[u][j] < v.first->p)
 				{
 					v.first->parent = u;
-					pq.priority(v.first->val, v.second);
+					pq.priority(v.first->val, matrix[u][j]);
 				}
 			}
 		}

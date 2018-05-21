@@ -127,6 +127,12 @@
   <ItemGroup>
     <Text Include="test.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="5.in" />
+    <None Include="50.in" />
+    <None Include="500.in" />
+    <None Include="5000.in" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

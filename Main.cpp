@@ -5,6 +5,7 @@
 #include <ctime>
 #include <chrono>
 #include <algorithm>
+#include <cmath>
 
 #include "Edge.h"
 #include "PriorityQueue.h"
@@ -169,7 +170,50 @@ void euler_walk(unsigned int max_vec, unsigned int start, Adj adj, time_point st
 	std::cout << step_count << " " << total_weight << " " << "?M?" << " " << dur << "ns" << std::endl;
 }
 
-int main(int argc, char* argv[])
+void generate_input(unsigned int n)
+{
+	unsigned int m;
+	m = (n % 2 == 0) ? (n / 2) * (n - 1) : ((n - 1) / 2) * n;
+
+	std::srand(unsigned(std::time(0)));
+	std::set<std::pair<int, int>> points;
+
+	while (points.size() < n)
+	{
+		points.insert({ std::rand() % 10000, std::rand() % 10000 });
+	}
+
+	std::vector<std::pair<int, int>> v_points(points.begin(), points.end());
+	std::vector<Edge> edges;
+
+	long long xx, yy, i = 0;
+
+	for (unsigned int x = 0; x < points.size(); x++)
+	{
+		for (unsigned int y = x + 1; y < points.size(); y++)
+		{
+			xx = (v_points[x].first - v_points[y].first) * (v_points[x].first - v_points[y].first);
+			yy = (v_points[x].second - v_points[y].second) * (v_points[x].second - v_points[y].second);
+			edges.push_back(Edge(x + 1, y + 1, std::sqrt(xx + yy)));
+			i++;
+		}
+	}
+
+	time_point start;
+	double weight;
+
+	start = std::chrono::system_clock::now();
+	random_walk(n, 1, build_adj(n, edges, false), start);
+	start = std::chrono::system_clock::now();
+	weighted_walk(n, 1, build_adj(n, edges, true), start);
+
+	start = std::chrono::system_clock::now();
+	euler_walk(n, 1, build_adj(n, Kruskal::mst(n, edges, weight), false), start);
+	start = std::chrono::system_clock::now();
+	euler_walk(n, 1, build_adj(n, Prim::mst(n, edges, weight), false), start);
+}
+
+void handle_input()
 {
 	unsigned int n, m;
 	std::cin >> n;
@@ -185,19 +229,28 @@ int main(int argc, char* argv[])
 		edges[i] = Edge(u, v, w);
 	}
 
-	std::vector<Edge> walk;
 	time_point start;
 	double weight;
-	
+
 	start = std::chrono::system_clock::now();
 	random_walk(n, 1, build_adj(n, edges, false), start);
 	start = std::chrono::system_clock::now();
 	weighted_walk(n, 1, build_adj(n, edges, true), start);
 
 	start = std::chrono::system_clock::now();
-	euler_walk(n, 1, build_adj(n, Prim::mst(n, edges, weight), false), start);
-	start = std::chrono::system_clock::now();
 	euler_walk(n, 1, build_adj(n, Kruskal::mst(n, edges, weight), false), start);
+	start = std::chrono::system_clock::now();
+	euler_walk(n, 1, build_adj(n, Prim::mst(n, edges, weight), false), start);
+}
+
+int main(int argc, char* argv[])
+{
+	for (unsigned int n = 5; n < 50000; n *= 10)
+	{
+		generate_input(n);
+		std::cout << std::endl;
+	}
+	// handle_input();
 
 	return 0;
 }

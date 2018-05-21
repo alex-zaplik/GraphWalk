@@ -73,6 +73,11 @@ namespace Kruskal
 			}
 		}
 
+		for (auto v : V)
+		{
+			delete v;
+		}
+
 		return A;
 	}
 }
